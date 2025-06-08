@@ -1,20 +1,39 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <link rel="manifest" href="manifest.json">
   <meta charset="UTF-8">
   <title>Skolyoz Açısı Hesaplama</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.json">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
   <style>
     body { background-color: #f8f9fa; padding: 2rem; }
-    #uploadedImage, canvas { display: block; margin: 1rem auto; max-width: 100%; border: 2px solid #198754; border-radius: 8px; }
-    #result { font-size: 1.3rem; font-weight: bold; color: #198754; text-align: center; margin-top: 1rem; }
-    #exercise { text-align: center; margin-top: 1rem; font-size: 1rem; }
-    #exercise img { max-width: 300px; margin-top: 1rem; border-radius: 10px; }
+    #uploadedImage, canvas {
+      display: block;
+      margin: 1rem auto;
+      max-width: 100%;
+      border: 2px solid #198754;
+      border-radius: 8px;
+    }
+    #result {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #198754;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    #exercise {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+    #exercise img {
+      max-width: 300px;
+      margin-top: 1rem;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
@@ -28,9 +47,14 @@
   </div>
 
   <script>
-    const up = document.getElementById('upload'), img = document.getElementById('uploadedImage'),
-          canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d'),
-          res = document.getElementById('result'), ex = document.getElementById('exercise');
+    const { drawConnectors, drawLandmarks } = window;
+
+    const up = document.getElementById('upload'),
+          img = document.getElementById('uploadedImage'),
+          canvas = document.getElementById('canvas'),
+          ctx = canvas.getContext('2d'),
+          res = document.getElementById('result'),
+          ex = document.getElementById('exercise');
 
     const pose = new Pose.Pose({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}` });
     pose.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
@@ -38,13 +62,17 @@
     pose.onResults(results => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (results.poseLandmarks) {
-        const l = results.poseLandmarks[11], r = results.poseLandmarks[12];
-        const dx = r.x - l.x, dy = r.y - l.y;
+        const l = results.poseLandmarks[11];
+        const r = results.poseLandmarks[12];
+        const dx = r.x - l.x;
+        const dy = r.y - l.y;
         const angle = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1);
         res.textContent = `Omuz açısı: ${angle}°`;
-        drawConnectors(ctx, results.poseLandmarks, Pose.POSE_CONNECTIONS, {color:'#00FF00',lineWidth:2});
-        drawLandmarks(ctx, results.poseLandmarks, {color:'#FF0000',lineWidth:2});
-        let msg='', im='';
+
+        drawConnectors(ctx, results.poseLandmarks, Pose.POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
+        drawLandmarks(ctx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 });
+
+        let msg = '', im = '';
         if (angle < 10) {
           msg = '🟢 Hafif eğim – Esneme hareketleri yeterli olabilir.';
           im = 'https://i.imgur.com/zDTM0X4.png';
@@ -78,16 +106,17 @@
       reader.readAsDataURL(file);
     };
   </script>
+
   <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(function(reg) {
-        console.log("✔ Service Worker ثبت شد", reg);
-      })
-      .catch(function(err) {
-        console.error("❌ خطا در ثبت Service Worker", err);
-      });
-  }
-</script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(function (reg) {
+          console.log("✔ Service Worker ثبت شد", reg);
+        })
+        .catch(function (err) {
+          console.error("❌ خطا در ثبت Service Worker", err);
+        });
+    }
+  </script>
 </body>
 </html>
