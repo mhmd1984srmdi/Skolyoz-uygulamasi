@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+  <link rel="manifest" href="manifest.json">
   <meta charset="UTF-8">
   <title>Skolyoz Açısı Hesaplama</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -77,5 +78,16 @@
       reader.readAsDataURL(file);
     };
   </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(function(reg) {
+        console.log("✔ Service Worker ثبت شد", reg);
+      })
+      .catch(function(err) {
+        console.error("❌ خطا در ثبت Service Worker", err);
+      });
+  }
+</script>
 </body>
 </html>
