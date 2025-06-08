@@ -1,0 +1,15 @@
+{
+  "name": "Skolyoz Açısı Tespit",
+  "short_name": "SkolyozApp",
+  "start_url": "./skolyoz-upload.html",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#0d6efd",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
