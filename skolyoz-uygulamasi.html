@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Skolyoz Açısını Tespit Et</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+  <style>
+    body { text-align: center; font-family: sans-serif; direction: ltr; }
+    video, canvas { width: 100%; max-width: 360px; border: 1px solid gray; margin: 10px auto; }
+    #result, #exercise { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>📷 Skolyoz Açısı Tespit Uygulaması</h2>
+  <video id="video" autoplay></video>
+  <canvas id="canvas"></canvas>
+  <p id="result">Açı hesaplanıyor...</p>
+  <div id="exercise"></div>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const result = document.getElementById('result');
+    const exercise = document.getElementById('exercise');
+
+    const pose = new Pose.Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
+    pose.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+
+    pose.onResults(results => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (results.poseLandmarks) {
+        const l = results.poseLandmarks[11];
+        const r = results.poseLandmarks[12];
+        const dx = r.x - l.x;
+        const dy = r.y - l.y;
+        const angle = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1);
+        result.textContent = `Omurga eğim açısı: ${angle} derece`;
+
+        let msg = '';
+        if (angle < 10) msg = 'Egzersiz: Hafif esneme, diyafram nefesi';
+        else if (angle < 25) msg = 'Egzersiz: Plank, yan germe';
+        else msg = '⚠️ Açı yüksek! Fizyoterapiste danışın.';
+
+        exercise.textContent = msg;
+      }
+    });
+
+    const camera = new Camera(video, {
+      onFrame: async () => { await pose.send({ image: video }); },
+      width: 360,
+      height: 480
+    });
+    camera.start();
+  </script>
+</body>
+</html>
